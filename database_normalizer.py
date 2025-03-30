@@ -6,7 +6,9 @@ def display_data(csv_path):
     csv_path = csv_path.replace('"', "").replace("\\", "/")
     data = pd.read_csv(csv_path)
     df = pd.DataFrame(data)
-    print(df)
+
+    print(df.head)
+    print(df.dtypes)
 
 
 def main():
