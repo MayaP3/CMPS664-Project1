@@ -13,3 +13,7 @@ def main():
 
     csv_path = input("Give path to csv file: ")
     display_data(csv_path)
+
+
+if __name__ == '__main__':
+    main()
