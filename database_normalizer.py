@@ -74,6 +74,21 @@ def find_partial_dependencies(primary_keys: list, closure_dict: dict) -> list:
     return possible_partial_dependencies
 
 
+def find_transitive_dependencies(closure_dict: dict, determinants: list, FD_list: list):
+    transitive_dependencies = []
+
+    for key, closure_set in closure_dict.items():
+        for attribute in closure_set:
+            if (attribute in determinants) & (attribute != key):
+                for determinant, dependent in FD_list:
+                    if determinant == attribute:
+                        transitive_dependencies.append((key, dependent))
+
+    print("Possible Transitive Dependencies: ", transitive_dependencies)
+
+    return transitive_dependencies
+
+
 def main():
 
     csv_path = input("Give path to csv file: ")
@@ -90,6 +105,8 @@ def main():
     closure_dict = compute_closure(FD_list)
 
     find_partial_dependencies(primary_keys, closure_dict)
+
+    find_transitive_dependencies(closure_dict, determinants, FD_list)
 
 
 if __name__ == '__main__':
