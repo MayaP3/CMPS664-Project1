@@ -34,6 +34,28 @@ def database_fds(functional_dependenices: list, primary_keys: list):
     return determinants, dependents, FD_list
 
 
+def compute_closure(FD_list: list) -> dict:
+    closure_dict = {}
+
+    for determinant, dependent in FD_list:
+        if determinant not in closure_dict.keys():
+            closure_dict[determinant] = set(determinant)
+            closure_dict[determinant].update(dependent)
+
+    if determinant in closure_dict.keys():
+        closure_dict[determinant].update(dependent)
+
+    for determinant in closure_dict.keys():
+        for key, value in closure_dict.items():
+            if determinant in value:
+                closure_dict[key].update(closure_dict[determinant])
+
+    print("")
+    print("Closure Dict: ", closure_dict)
+
+    return closure_dict
+
+
 def main():
 
     csv_path = input("Give path to csv file: ")
@@ -47,7 +69,10 @@ def main():
     primary_keys = [(
         key.strip() for key in input("Enter primary key(s): ").split(','))]
 
-    database_fds(functional_dependencies, primary_keys)
+    determinants, dependents, FD_list = database_fds(functional_dependencies,
+                                                     primary_keys)
+
+    compute_closure(determinants, dependents, FD_list)
 
 
 if __name__ == '__main__':
