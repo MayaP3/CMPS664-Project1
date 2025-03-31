@@ -40,11 +40,12 @@ def main():
     display_data(csv_path)
 
     # relation_name = input("Enter relation name: ")
-    functional_dependencies = (
-        list(input(
-            ("Enter functional dependencies (e.g., A->B, C->D): ").split(',')))
-        )
-    primary_keys = list(input("Enter primary key(s): ").split(','))
+    functional_dependencies = [(
+        fd.strip() for fd in input(
+            ("Enter functional dependencies (e.g., A->B, C->D): ").split(',')
+            ))]
+    primary_keys = [(
+        key.strip() for key in input("Enter primary key(s): ").split(','))]
 
     database_fds(functional_dependencies, primary_keys)
 
