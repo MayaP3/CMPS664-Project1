@@ -17,21 +17,21 @@ def database_fds(functional_dependenices: list, primary_keys: list):
     determinants = []
     dependents = []
 
-    FD_dict = {}
+    FD_list = []
 
     for i in range(len(functional_dependenices)):
         left, right = functional_dependenices[i].split('->')
         determinants.append(left)
         dependents.append(right)
-        FD_dict[left] = right
+        FD_list.append((left, right))
 
     print("Deteminants: ", determinants)
     print("")
     print("Dependents: ", dependents)
     print("")
-    print("Functional Dependencies: ", FD_dict)
+    print("Functional Dependencies: ", FD_list)
 
-    return determinants, dependents, FD_dict
+    return determinants, dependents, FD_list
 
 
 def main():
