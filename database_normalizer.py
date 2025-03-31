@@ -56,23 +56,40 @@ def compute_closure(FD_list: list) -> dict:
     return closure_dict
 
 
+def find_partial_dependencies(primary_keys: list, closure_dict: dict) -> list:
+    possible_partial_dependencies = []
+
+    if len(primary_keys) > 1:
+        for i in primary_keys:
+            for j in primary_keys:
+                if closure_dict[i] != closure_dict[j]:
+                    for dependency in closure_dict[i]:
+                        if (dependency not in closure_dict[j]) & (i != dependency):
+                            possible_partial_dependencies.append((i, dependency))
+
+    print("")
+    print("With primary keys: ", primary_keys)
+    print("Possible Partial Dependencies: ", possible_partial_dependencies)
+
+    return possible_partial_dependencies
+
+
 def main():
 
     csv_path = input("Give path to csv file: ")
     display_data(csv_path)
 
     # relation_name = input("Enter relation name: ")
-    functional_dependencies = [(
-        fd.strip() for fd in input(
-            ("Enter functional dependencies (e.g., A->B, C->D): ").split(',')
-            ))]
-    primary_keys = [(
-        key.strip() for key in input("Enter primary key(s): ").split(','))]
+    functional_dependencies = [fd.strip() for fd in input("Enter functional dependencies (e.g., A->B, C->D): ").split(',')]
+    primary_keys = [key.strip() for key in input("Enter primary key(s): ").split(',')]
 
-    determinants, dependents, FD_list = database_fds(functional_dependencies,
-                                                     primary_keys)
+    print(functional_dependencies)
 
-    compute_closure(determinants, dependents, FD_list)
+    determinants, dependents, FD_list = database_fds(functional_dependencies)
+
+    closure_dict = compute_closure(FD_list)
+
+    find_partial_dependencies(primary_keys, closure_dict)
 
 
 if __name__ == '__main__':
