@@ -84,9 +84,33 @@ def find_transitive_dependencies(closure_dict: dict, determinants: list, FD_list
                     if determinant == attribute:
                         transitive_dependencies.append((key, dependent))
 
+    print("")
     print("Possible Transitive Dependencies: ", transitive_dependencies)
 
     return transitive_dependencies
+
+
+def suggest_candidate_key(determinants, closure_dict):
+    largest_length = -1
+    largest_set = {}
+    best_i = None
+    best_j = None
+
+    for i in determinants:
+        for j in determinants:
+            if j not in i:
+                combined_set = set(closure_dict[i]) | set(closure_dict[j])
+
+                if len(combined_set) > largest_length:
+                    largest_length = len(combined_set)
+                    largest_set = combined_set
+                    best_i = i
+                    best_j = j
+
+    print("")
+    print(best_i, "and", best_j, "creates", largest_set, "the largest set")
+
+    return best_i, best_j, largest_set
 
 
 def main():
