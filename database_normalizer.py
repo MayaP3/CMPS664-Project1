@@ -31,6 +31,8 @@ def database_fds(functional_dependenices: list, primary_keys: list):
     print("")
     print("Functional Dependencies: ", FD_dict)
 
+    return determinants, dependents, FD_dict
+
 
 def main():
 
@@ -38,7 +40,10 @@ def main():
     display_data(csv_path)
 
     # relation_name = input("Enter relation name: ")
-    functional_dependencies = list(input("Enter functional dependencies (e.g., A->B, C->D): ").split(','))
+    functional_dependencies = (
+        list(input(
+            ("Enter functional dependencies (e.g., A->B, C->D): ").split(',')))
+        )
     primary_keys = list(input("Enter primary key(s): ").split(','))
 
     database_fds(functional_dependencies, primary_keys)
