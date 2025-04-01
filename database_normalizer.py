@@ -75,8 +75,11 @@ def find_partial_dependencies(primary_keys: list, closure_dict: dict) -> list:
     print("")
     print("With primary keys: ", primary_keys)
     print("Possible Partial Dependencies: ", possible_partial_dependencies)
-
-    return possible_partial_dependencies
+    if len(possible_partial_dependencies) > 0:
+        satisfies_2nf = False
+    else:
+        satisfies_2nf = True
+    return satisfies_2nf, possible_partial_dependencies
 
 
 def find_transitive_dependencies(closure_dict: dict, determinants: list, FD_list: list):
