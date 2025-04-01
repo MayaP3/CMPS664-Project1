@@ -39,17 +39,16 @@ def database_fds(functional_dependencies: list):
     return relation, determinants, dependents, FD_list
 
 
-
 def compute_closure(FD_list: list) -> dict:
     closure_dict = {}
 
     for determinant, dependent in FD_list:
         if determinant not in closure_dict.keys():
-            closure_dict[determinant] = set(determinant)
-            closure_dict[determinant].update(dependent)
+            closure_dict[determinant] = {determinant}
+            closure_dict[determinant].update({dependent})
 
-    if determinant in closure_dict.keys():
-        closure_dict[determinant].update(dependent)
+        if determinant in closure_dict.keys():
+            closure_dict[determinant].update({dependent})
 
     for determinant in closure_dict.keys():
         for key, value in closure_dict.items():
