@@ -95,7 +95,12 @@ def find_transitive_dependencies(closure_dict: dict, determinants: list, FD_list
     print("")
     print("Possible Transitive Dependencies: ", transitive_dependencies)
 
-    return transitive_dependencies
+    if len(transitive_dependencies) > 0:
+        satisfies_3nf = False
+    else:
+        satisfies_3nf = True
+
+    return satisfies_3nf, transitive_dependencies
 
 
 def suggest_candidate_key(determinants, closure_dict):
