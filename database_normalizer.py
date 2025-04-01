@@ -12,26 +12,32 @@ def display_data(csv_path):
 
 
 # Functional Dependency Identifcation
-def database_fds(functional_dependenices: list, primary_keys: list):
+def database_fds(functional_dependencies: list):
 
+    relation = set()
     determinants = []
     dependents = []
 
     FD_list = []
 
-    for i in range(len(functional_dependenices)):
-        left, right = functional_dependenices[i].split('->')
+    for i in range(len(functional_dependencies)):
+        left, right = functional_dependencies[i].split('->')
         determinants.append(left)
         dependents.append(right)
         FD_list.append((left, right))
+        relation.update(list({left}))
+        relation.update(list({right}))
 
+    print("Relation: ", relation)
+    print("")
     print("Deteminants: ", determinants)
     print("")
     print("Dependents: ", dependents)
     print("")
     print("Functional Dependencies: ", FD_list)
 
-    return determinants, dependents, FD_list
+    return relation, determinants, dependents, FD_list
+
 
 
 def compute_closure(FD_list: list) -> dict:
