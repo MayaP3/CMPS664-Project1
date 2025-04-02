@@ -2,7 +2,6 @@ import pandas as pd
 import itertools
 
 
-
 # Import csv
 def display_data(csv_path):
     csv_path = csv_path.replace('"', "").replace("\\", "/")
@@ -135,27 +134,38 @@ def find_transitive_dependencies(closure_dict: dict, determinants: list, FD_list
     return satisfies_3nf, transitive_dependencies
 
 
-def suggest_candidate_key(determinants, closure_dict):
-    largest_length = -1
-    largest_set = {}
-    best_i = None
-    best_j = None
+def suggest_candidate_key(relation: set, closure_dict: dict):
+    superkeys = {}
+    candidate_keys = {}
 
-    for i in determinants:
-        for j in determinants:
-            if j not in i:
-                combined_set = set(closure_dict[i]) | set(closure_dict[j])
+    # If closure as all the attributes, the attribute is a superkey
+    for attribute, closure in closure_dict.items():
+        if len(closure) == len(relation):
+            superkeys[attribute] = closure
 
-                if len(combined_set) > largest_length:
-                    largest_length = len(combined_set)
-                    largest_set = combined_set
-                    best_i = i
-                    best_j = j
+    # If no subset of the superkey is superkey, the attribute is a candidate key
+    for superkey, closure in superkeys.items():
+        attrs = superkey.split('/')
 
-    print("")
-    print(best_i, "and", best_j, "creates", largest_set, "the largest set")
+        # If there's only one attr, its subset if null, to it's a C key
+        if len(attrs) == 1:
+            candidate_keys[superkey] = closure
+        else:
+            combinations = []
+            for r in range(1, len(attrs) + 1):
+                for combo in itertools.combinations(attrs, r):
+                    combinations.append('/'.join(combo))
 
-    return best_i, best_j, largest_set
+            is_candidate_key = True
+            for combo in combinations:
+                if combo in superkeys:
+                    is_candidate_key = False
+                    break
+
+            if is_candidate_key:
+                candidate_keys[superkey] = closure
+
+    return candidate_keys
 
 
 def main():
