@@ -1,4 +1,6 @@
 import pandas as pd
+import itertools
+
 
 
 # Import csv
@@ -39,21 +41,51 @@ def database_fds(functional_dependencies: list):
     return relation, determinants, dependents, FD_list
 
 
-def compute_closure(FD_list: list) -> dict:
+def attribute_combos(determinants: list, dependents: list):
+
+    combined_list = list(set(determinants + dependents))
+
+    combinations = []
+
+    for r in range(1, len(combined_list) + 1):
+        for combo in itertools.combinations(combined_list, r):
+            combinations.append('/'.join(combo))
+
+    return combinations
+
+
+def compute_closure(FD_list: list):
     closure_dict = {}
+    determinants = []
+    dependents = []
+    for determinant, dependent in FD_list:
+        determinants.append(determinant)
+        dependents.append(dependent)
 
     for determinant, dependent in FD_list:
         if determinant not in closure_dict.keys():
             closure_dict[determinant] = {determinant}
             closure_dict[determinant].update({dependent})
 
-        if determinant in closure_dict.keys():
-            closure_dict[determinant].update({dependent})
+    if dependent not in closure_dict.keys():
+        closure_dict[dependent] = {dependent}
+
+    if determinant in closure_dict.keys():
+        closure_dict[determinant].update({dependent})
 
     for determinant in closure_dict.keys():
         for key, value in closure_dict.items():
             if determinant in value:
                 closure_dict[key].update(closure_dict[determinant])
+
+    attribute_combos_results = attribute_combos(determinants, dependents)
+
+    for attr_combo in attribute_combos_results:
+        if attr_combo not in closure_dict.keys():
+            closure_dict[attr_combo] = set()
+            attrs = [attrs for attrs in attr_combo.split('/')]
+            for attr in attrs:
+                closure_dict[attr_combo].update(closure_dict[attr])
 
     print("")
     print("Closure Dict: ", closure_dict)
