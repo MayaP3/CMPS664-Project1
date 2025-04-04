@@ -25,13 +25,23 @@ def database_fds(functional_dependencies: list):
 
     for i in range(len(functional_dependencies)):
         left, right = functional_dependencies[i].split('->')
+
         left = left.replace(" ", "")
-        right = right.replace(" ", "")
-        determinants.append(left)
-        dependents.append(right)
+
+        right = [item.replace(" ", "") for item in right.split(',')]
+
+        for i in range(len(right)):
+            determinants.append(left)
+
+        for dependent in right:
+            dependents.append(dependent)
+
         FD_list.append((left, right))
+
         relation.update(list({left}))
-        relation.update(list({right}))
+
+        for r in right:
+            relation.update(list({r}))
 
     print("Relation: ", relation)
     print("")
@@ -46,14 +56,19 @@ def database_fds(functional_dependencies: list):
 
 def attribute_combos(determinants: list, dependents: list):
 
-    combined_list = list(set(determinants + dependents))
+    # Combine the two lists (unique)
+    for dep in dependents:
+        combined_list = list(set(determinants + dep))
 
+    # Generate all possible combinations of any length
     combinations = []
 
+    # Generate combinations of different lengths (1 to the length of the combined list)
     for r in range(1, len(combined_list) + 1):
         for combo in itertools.combinations(combined_list, r):
             combinations.append('/'.join(combo))
 
+    # Print the resulting combinations
     return combinations
 
 
@@ -68,13 +83,16 @@ def compute_closure(FD_list: list):
     for determinant, dependent in FD_list:
         if determinant not in closure_dict.keys():
             closure_dict[determinant] = {determinant}
-            closure_dict[determinant].update({dependent})
+    for dep in dependent:
+        closure_dict[determinant].update({dep})
 
-    if dependent not in closure_dict.keys():
-        closure_dict[dependent] = {dependent}
+    for dep in dependent:
+        if dep not in closure_dict.keys():
+            closure_dict[dep] = {dep}
 
     if determinant in closure_dict.keys():
-        closure_dict[determinant].update({dependent})
+        for dep in dependent:
+            closure_dict[dep].update({dep})
 
     for determinant in closure_dict.keys():
         for key, value in closure_dict.items():
@@ -195,7 +213,7 @@ def main():
     display_data(csv_path)
 
     # relation_name = input("Enter relation name: ")
-    functional_dependencies = [fd.strip() for fd in input("Enter functional dependencies (e.g., A->B, C->D): ").split(',')]
+    functional_dependencies = [fd.strip() for fd in input("Enter functional dependencies (e.g., A->B,D; C->D): ").split(';')]
     primary_keys = [key.strip() for key in input("Enter primary key(s): ").split(',')]
 
     print(functional_dependencies)
