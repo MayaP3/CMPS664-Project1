@@ -23,6 +23,8 @@ def database_fds(functional_dependencies: list):
 
     for i in range(len(functional_dependencies)):
         left, right = functional_dependencies[i].split('->')
+        left = left.replace(" ", "")
+        right = right.replace(" ", "")
         determinants.append(left)
         dependents.append(right)
         FD_list.append((left, right))
