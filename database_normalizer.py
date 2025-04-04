@@ -11,6 +11,8 @@ def display_data(csv_path):
     print(df.head)
     print(df.dtypes)
 
+    return df
+
 
 # Functional Dependency Identifcation
 def database_fds(functional_dependencies: list):
