@@ -172,6 +172,23 @@ def suggest_candidate_key(relation: set, closure_dict: dict):
     return candidate_keys
 
 
+def check_1NF(df: pd.DataFrame) -> bool:
+    # Check to see if every cell value is a single value
+    # i.e. can be a int, float, str, but not a list, array, series
+    def is_single_value(x):
+        return not isinstance(x, (list, tuple, set, dict, pd.Series))
+
+    all_single_values = df.map(is_single_value).all().all()
+
+    # Check to see if every row in the df is unique
+    is_unique = not df.duplicated().any()
+
+    if all_single_values & is_unique:
+        return True
+    else:
+        return False
+
+
 def main():
 
     csv_path = input("Give path to csv file: ")
