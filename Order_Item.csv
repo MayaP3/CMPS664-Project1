@@ -1,0 +1,4 @@
+OrderID,ProductID,OrderDate,ProductName,ProductPrice,QuantityOrdered
+O001,P001,2025-04-01,Laptop,1000,2
+O002,P002,2025-04-02,Headphones,150,3
+O003,P001,2025-04-03,Laptop,1000,1

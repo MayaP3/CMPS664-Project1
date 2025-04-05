@@ -1,0 +1,4 @@
+StudentID,ClubID,StudentName,ClubName,ClubAdvisor
+S001,C101,Alice Johnson,Chess Club,Dr. Lee
+S002,C102,Bob Lee,Debate Club,Dr. Miller
+S003,C101,Charlie White,Chess Club,Dr. Lee

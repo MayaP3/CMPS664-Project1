@@ -1,0 +1,4 @@
+ProductID,SupplierID,ProductName,SupplierName,SupplierContact,ProductPrice
+P001,S001,Laptop,TechSupply,555-1234,1000
+P002,S002,Headphones,AudioPro,555-5678,150
+P001,S003,Laptop,GadgetWorks,555-9876,950

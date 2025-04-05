@@ -1,0 +1,4 @@
+StudentID,CourseID,StudentName,CourseName,InstructorName
+S001,C101,Tom Green,Math 101,Dr. Brown
+S002,C102,Lisa White,Physics 101,Dr. Adams
+S003,C101,Mark Black,Math 101,Dr. Brown
