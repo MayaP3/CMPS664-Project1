@@ -26,8 +26,6 @@ def database_fds(functional_dependencies: list):
     for i in range(len(functional_dependencies)):
         left, right = functional_dependencies[i].split('->')
 
-        left = left.replace(" ", "")
-
         right = [item.replace(" ", "") for item in right.split(',')]
 
         for i in range(len(right)):
@@ -38,7 +36,7 @@ def database_fds(functional_dependencies: list):
 
         FD_list.append((left, right))
 
-        relation.update(list({left}))
+        relation.update(list(left.split('|')))
 
         for r in right:
             relation.update(list({r}))
@@ -56,19 +54,15 @@ def database_fds(functional_dependencies: list):
 
 def attribute_combos(determinants: list, dependents: list):
 
-    # Combine the two lists (unique)
     for dep in dependents:
         combined_list = list(set(determinants + dep))
 
-    # Generate all possible combinations of any length
     combinations = []
 
-    # Generate combinations of different lengths (1 to the length of the combined list)
     for r in range(1, len(combined_list) + 1):
         for combo in itertools.combinations(combined_list, r):
             combinations.append('/'.join(combo))
 
-    # Print the resulting combinations
     return combinations
 
 
@@ -76,13 +70,20 @@ def compute_closure(FD_list: list):
     closure_dict = {}
     determinants = []
     dependents = []
+
     for determinant, dependent in FD_list:
         determinants.append(determinant)
         dependents.append(dependent)
 
     for determinant, dependent in FD_list:
         if determinant not in closure_dict.keys():
-            closure_dict[determinant] = {determinant}
+            composite = tuple(determinant.split('|'))
+            closure_dict[determinant] = set()
+            for c in composite:
+                closure_dict[determinant].add(c)
+                if c not in closure_dict:
+                    closure_dict[c] = {c}
+
     for dep in dependent:
         closure_dict[determinant].update({dep})
 
@@ -100,6 +101,7 @@ def compute_closure(FD_list: list):
                 closure_dict[key].update(closure_dict[determinant])
 
     attribute_combos_results = attribute_combos(determinants, dependents)
+    print(attribute_combos_results)
 
     for attr_combo in attribute_combos_results:
         if attr_combo not in closure_dict.keys():
