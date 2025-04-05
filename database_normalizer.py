@@ -178,7 +178,9 @@ def suggest_candidate_key(relation: set, closure_dict: dict):
             combinations = []
             for r in range(1, len(attrs) + 1):
                 for combo in itertools.combinations(attrs, r):
-                    combinations.append('/'.join(combo))
+                    if str(combo) != str(superkey):
+                        combinations.append('/'.join(combo))
+            combinations.remove(superkey)
 
             is_candidate_key = True
             for combo in combinations:
@@ -188,6 +190,15 @@ def suggest_candidate_key(relation: set, closure_dict: dict):
 
             if is_candidate_key:
                 candidate_keys[superkey] = closure
+
+        for key1 in list(candidate_keys.keys()):
+            cand_key1 = key1.replace('|', ',').replace('/', ',')
+            for key2 in list(candidate_keys.keys())[1:]:
+                cand_key2 = key2.replace('|', ',').replace('/', ',')
+                if cand_key1 == cand_key2 and key1 != key2:
+                    del candidate_keys[key2]
+
+    print("Candidate Keys: ", candidate_keys)
 
     return candidate_keys
 
