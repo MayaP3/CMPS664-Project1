@@ -215,7 +215,7 @@ def main():
     display_data(csv_path)
 
     # relation_name = input("Enter relation name: ")
-    functional_dependencies = [fd.strip() for fd in input("Enter functional dependencies (e.g., A->B,D; C->D): ").split(';')]
+    functional_dependencies = [fd.replace(" ", "") for fd in input("Enter functional dependencies (e.g., A->B,D; C->D): ").split(';')]
     primary_keys = [key.strip() for key in input("Enter primary key(s): ").split(',')]
 
     print(functional_dependencies)
