@@ -141,14 +141,19 @@ def find_partial_dependencies(primary_keys: list, closure_dict: dict) -> dict:
 
 
 def find_transitive_dependencies(closure_dict: dict, determinants: list, FD_list: list):
-    transitive_dependencies = []
+    transitive_dependencies = {}
 
     for key, closure_set in closure_dict.items():
         for attribute in closure_set:
             if (attribute in determinants) & (attribute != key):
                 for determinant, dependent in FD_list:
                     if determinant == attribute:
-                        transitive_dependencies.append((key, dependent))
+                        if key not in transitive_dependencies:
+                            transitive_dependencies[key] = set()
+                        for dep in dependent:
+                            transitive_dependencies[key].add(dep)
+
+    transitive_dependencies = {key: list(value) for key, value in transitive_dependencies.items()}
 
     print("")
     print("Possible Transitive Dependencies: ", transitive_dependencies)
