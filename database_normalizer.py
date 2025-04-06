@@ -223,6 +223,34 @@ def check_1NF(df: pd.DataFrame) -> bool:
         return False
 
 
+def decompose_to_2nf(df: pd.DataFrame, possible_partial_dependencies: dict) -> list:
+
+    relations = []
+
+    for key, dependent_attr in possible_partial_dependencies.items():            
+        subset = df[[key]].drop_duplicates()
+        for dep in dependent_attr:
+            subset[dep] = df[dep]
+        relations.append(subset)
+
+    used_dep_list = []
+
+    for dep in possible_partial_dependencies.values():
+        for _ in dep:
+            used_dep_list.append(_)
+
+    print("Used_deps: ", used_dep_list)
+
+    remaining_attrs = [col for col in df.columns if col not in used_dep_list]
+    remaining_relation = df[remaining_attrs].drop_duplicates()
+    relations.append(remaining_relation)
+
+    for i, relation in enumerate(relations):
+        relations[i] = relation.drop_duplicates()
+
+    return relations
+
+
 def main():
 
     csv_path = input("Give path to csv file: ")
