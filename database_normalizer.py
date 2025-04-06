@@ -116,8 +116,8 @@ def compute_closure(FD_list: list):
     return closure_dict
 
 
-def find_partial_dependencies(primary_keys: list, closure_dict: dict) -> list:
-    possible_partial_dependencies = []
+def find_partial_dependencies(primary_keys: list, closure_dict: dict) -> dict:
+    possible_partial_dependencies = {}
 
     if len(primary_keys) > 1:
         for i in primary_keys:
@@ -125,7 +125,10 @@ def find_partial_dependencies(primary_keys: list, closure_dict: dict) -> list:
                 if closure_dict[i] != closure_dict[j]:
                     for dependency in closure_dict[i]:
                         if (dependency not in closure_dict[j]) & (i != dependency):
-                            possible_partial_dependencies.append((i, dependency))
+                            if i not in possible_partial_dependencies:
+                                possible_partial_dependencies[i] = [dependency]
+                            else:
+                                possible_partial_dependencies[i].append(dependency)
 
     print("")
     print("With primary keys: ", primary_keys)
