@@ -1,0 +1,5 @@
+EmployeeID,ProjectID,EmployeeName,ProjectName,ProjectManager,ManagerEmail
+E101,P101,Alice,Project A,Bob,bob@company.com
+E102,P102,Charlie,Project B,Alice,alice@company.com
+E101,P103,Alice,Project C,Bob,bob@company.com
+E103,P101,David,Project A,Bob,bob@company.com

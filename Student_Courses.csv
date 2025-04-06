@@ -1,0 +1,5 @@
+StudentID,CourseID,StudentName,CourseName,InstructorName,InstructorPhone
+1,C101,John,Math,Dr. Smith,123-456-7890
+2,C102,Jane,Physics,Dr. Adams,234-567-8901
+1,C103,John,Chemistry,Dr. Smith,123-456-7890
+3,C101,Bob,Math,Dr. Smith,123-456-7890
