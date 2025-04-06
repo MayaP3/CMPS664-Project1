@@ -1,0 +1,19 @@
+# Student_Course_Enrollment
+# FDs: StudentID|CourseID -> StudentName, CourseName, InstructorName; StudentID -> StudentName; CourseID -> CourseName, InstructorName
+# Primary keys: StudentID, CourseID
+
+# Order_Item
+# FDs: OrderID|ProductID -> OrderDate, ProductName, ProductPrice, QuantityOrdered; OrderID -> OrderDate; ProductID -> ProductName, ProductPrice
+# Primary Keys: OrderID, ProductID
+
+# Employee_Project_Assignment
+# FDs: EmployeeID|ProjectID -> EmployeeName, ProjectName, ProjectBudget, EmployeeRole; EmployeeID -> EmployeeName; ProjectID -> ProjectName, ProjectBudget
+# Primary Keys:  EmployeeID, ProjectID
+
+# Product_Supplier
+# FDs: ProductID|SupplierID -> ProductName, SupplierName, SupplierContact, ProductPrice; ProductID -> ProductName; SupplierID -> SupplierName, SupplierContact
+# Primary Key: ProductID, SupplierID
+
+# Student_Club_Membership
+# FDs: StudentID|ClubID -> StudentName, ClubName, ClubAdvisor; StudentID -> StudentName; ClubID -> ClubName, ClubAdvisor
+# Primary keys: StudentID, ClubID
