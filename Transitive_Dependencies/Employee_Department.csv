@@ -1,0 +1,4 @@
+EmployeeID,DepartmentID,EmployeeName,DepartmentName,DepartmentManager,ManagerEmail
+E101,D01,Alice,HR,Bob,bob@company.com
+E102,D02,Charlie,IT,Alice,alice@company.com
+E103,D01,David,HR,Bob,bob@company.com
