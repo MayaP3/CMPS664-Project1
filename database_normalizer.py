@@ -224,57 +224,48 @@ def find_partial_dependencies(primary_keys: list, closure_dict: dict) -> list:
     return satisfies_2nf, possible_partial_dependencies
 
 
-def find_transitive_dependencies(closure_dict: dict, determinants: list, FD_list: list):
-    """
-    Creates a list of the transitive_dependencies
-    (i.e A->B, B->C ---> [(A, C)]) given the closure dictionary of every
-    attribute and attribute combo's closure sets, a list of the
-    determinants and the list of tuples of Functional Dependencies
+def find_transitive_dependencies(closure_dict: dict, determinants: list, dependents: list, FD_list: list):
+    """ 
+    Creates a list of the transitive_dependencies (i.e A->B, B->C ---> [(A, C)]) given the
+    closure dictionary of every attribute and attribute combo's closure sets, a list of the
+    determinants and the list of tuples of Functional Dependencies 
 
-    Goal: If a determinant has a dependent that is also a determinant with
-    its own dependents, a transitive connection is found
+    Goal: If a determinant has a dependent that is also a determinant with its own dependents,
+    a transitive connection is found
     """
     transitive_dependencies = {}
-    intermediate_attrs = {}
 
     # For each attribute and it's closure set
     for key, closure_set in closure_dict.items():
         # For each attribute in that closure set
         for attribute in closure_set:
-            # If the attribute in the set is a determinant and isn't itself
-            # (As closure of A will include A itself)
+            # If the attribute in the set is a determinant and isn't itself (As closure of A will include A itself)
             if (attribute in determinants) & (attribute != key):
                 # For deter and dep list in FD_list
                 for determinant, dependent in FD_list:
-                    # Add the intermdiate connection of deter to dep
-                    # to intermediate_attrs
-                    intermediate_attrs[determinant] = dependent
-                    # If the attribute that is both a dep and a deter,
-                    # add the original determinant as the key and
-                    # this attribute's dependents unique set as the value
-                    # to transitive_dependencies
-                    if determinant == attribute:
+                    # If the attribute that is both a dep and a deter, add that attribute as the key and
+                    # this attribute's dependents unique set as the value to transitive_dependencies
+                    if (determinant == attribute) & (attribute in dependents):
                         if key not in transitive_dependencies:
-                            transitive_dependencies[key] = set()
+                            transitive_dependencies[attribute] = set()
                         for dep in dependent:
-                            transitive_dependencies[key].add(dep)
-
-    print("Intermediate Attrs: ", intermediate_attrs)
+                            transitive_dependencies[attribute].add(dep)
 
     # Convert transitive_deps' values from a set to a list
     transitive_dependencies = {key: list(value) for key, value in transitive_dependencies.items()}
 
+
     print("")
     print("Possible Transitive Dependencies: ", transitive_dependencies)
 
-    # If the transitive_dependencies list length is > 0, a transitive_dep
-    # was found and hence the dataframe does not satisfy 3NF
+    # If the transitive_dependencies list length is > 0, a transitive_dep was found
+    # and hence the dataframe does not satisfy 3NF
     if len(transitive_dependencies) > 0:
         satisfies_3nf = False
     else:
         satisfies_3nf = True
 
-    return satisfies_3nf, transitive_dependencies, intermediate_attrs
+    return satisfies_3nf, transitive_dependencies
 
 
 def suggest_candidate_key(relation: set, closure_dict: dict):
