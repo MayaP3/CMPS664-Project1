@@ -225,13 +225,14 @@ def find_partial_dependencies(primary_keys: list, closure_dict: dict) -> list:
 
 
 def find_transitive_dependencies(closure_dict: dict, determinants: list, dependents: list, FD_list: list):
-    """ 
-    Creates a list of the transitive_dependencies (i.e A->B, B->C ---> [(A, C)]) given the
-    closure dictionary of every attribute and attribute combo's closure sets, a list of the
-    determinants and the list of tuples of Functional Dependencies 
+    """
+    Creates a list of the transitive_dependencies
+    (i.e A->B, B->C ---> [(A, C)]) given the closure dictionary of every
+    attribute and attribute combo's closure sets, a list of the
+    determinants and the list of tuples of Functional Dependencies
 
-    Goal: If a determinant has a dependent that is also a determinant with its own dependents,
-    a transitive connection is found
+    Goal: If a determinant has a dependent that is also a determinant with
+    its own dependents, a transitive connection is found
     """
     transitive_dependencies = {}
 
@@ -239,12 +240,15 @@ def find_transitive_dependencies(closure_dict: dict, determinants: list, depende
     for key, closure_set in closure_dict.items():
         # For each attribute in that closure set
         for attribute in closure_set:
-            # If the attribute in the set is a determinant and isn't itself (As closure of A will include A itself)
+            # If the attribute in the set is a determinant and isn't itself
+            # (As closure of A will include A itself)
             if (attribute in determinants) & (attribute != key):
                 # For deter and dep list in FD_list
                 for determinant, dependent in FD_list:
-                    # If the attribute that is both a dep and a deter, add that attribute as the key and
-                    # this attribute's dependents unique set as the value to transitive_dependencies
+                    # If the attribute that is both a dep and a deter,
+                    # add that attribute as the key and this attribute's
+                    # dependents unique set as the value to
+                    # transitive_dependencies
                     if (determinant == attribute) & (attribute in dependents):
                         if key not in transitive_dependencies:
                             transitive_dependencies[attribute] = set()
@@ -254,12 +258,11 @@ def find_transitive_dependencies(closure_dict: dict, determinants: list, depende
     # Convert transitive_deps' values from a set to a list
     transitive_dependencies = {key: list(value) for key, value in transitive_dependencies.items()}
 
-
     print("")
     print("Possible Transitive Dependencies: ", transitive_dependencies)
 
-    # If the transitive_dependencies list length is > 0, a transitive_dep was found
-    # and hence the dataframe does not satisfy 3NF
+    # If the transitive_dependencies list length is > 0, a transitive_dep was
+    # found and hence the dataframe does not satisfy 3NF
     if len(transitive_dependencies) > 0:
         satisfies_3nf = False
     else:
@@ -390,6 +393,61 @@ def decompose_to_2nf(df: pd.DataFrame, possible_partial_dependencies: dict) -> l
     relations.append(remaining_relation)
 
     # remove any duplicate rows from the dataframe
+    for i, relation in enumerate(relations):
+        relations[i] = relation.drop_duplicates()
+
+    return relations
+
+
+def decompose_to_3nf(df: pd.DataFrame, transitive_dependencies: dict) -> list:
+    """
+    Given a df, the original dfs' transitive dependencies and intermediate
+    attributes causing the transivity, this function is meant to divide
+    the df into seperate dfs to satify 3NF: no transitive connections
+    """
+    trans_dep_subset_dict = {}
+
+    # transitive_deps includes transitive dependencies found for every combo
+    # of attributes. Just want to focus on the direct attributes of the
+    # dataframe
+    for key, value in transitive_dependencies.items():
+        if key in df.columns:
+            trans_dep_subset_dict[key] = value
+
+    print("Transitive Dict of the attributes: ", trans_dep_subset_dict)
+
+    relations = []
+
+    # for the determinant and its list of deps causing the transitivity
+    # if the list of dependents is equal to the list of dependencies in the
+    # intermediate_attrs then the middle inter attribute is equal to the
+    # key of that dict
+    for key, dependent_attr in trans_dep_subset_dict.items():
+        inter_attr = key
+        # add the inter_attr and its dependencies to the subset df
+        subset = df[[inter_attr]].drop_duplicates()
+        for dep in dependent_attr:
+            subset[dep] = df[dep]
+        # add new df to relations list
+        relations.append(subset)
+
+    # keep track of the dependencies already added to a subset df
+    used_dep_list = []
+
+    for dep in trans_dep_subset_dict.values():
+        for _ in dep:
+            used_dep_list.append(_)
+
+    print("Used_deps: ", used_dep_list)
+
+    # Put the remaining non-key attributes into the next df subset
+
+    remaining_attrs = [col for col in df.columns if col not in used_dep_list]
+    remaining_relation = df[remaining_attrs].drop_duplicates()
+    relations.append(remaining_relation)
+
+    # remove any duplicate rows from the dataframe
+
     for i, relation in enumerate(relations):
         relations[i] = relation.drop_duplicates()
 
