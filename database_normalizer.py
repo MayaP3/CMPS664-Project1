@@ -403,7 +403,7 @@ def decompose_to_2nf(df: pd.DataFrame, possible_partial_dependencies: dict) -> l
     return relations
 
 
-def decompose_to_3nf(df: pd.DataFrame, transitive_dependencies: dict) -> list:
+def decompose_to_3nf(original_df: pd.DataFrame, df: pd.DataFrame, FD_list: list, transitive_dependencies: dict) -> list:
     """
     Given a df, the original dfs' transitive dependencies and intermediate
     attributes causing the transivity, this function is meant to divide
@@ -439,24 +439,74 @@ def decompose_to_3nf(df: pd.DataFrame, transitive_dependencies: dict) -> list:
     # keep track of the dependencies already added to a subset df
     used_dep_list = []
 
-    for dep in trans_dep_subset_dict.values():
-        for _ in dep:
-            used_dep_list.append(_)
+    if len(trans_dep_subset_dict) == 0:
+        subset = df.copy()
 
-    print("Used_deps: ", used_dep_list)
+        # For each determinant, add its dependencies to the subset
+        for deter, depends in FD_list:
+            if deter in df.columns:  # Ensure the determinant is present in the DataFrame
+                for dep in depends:
+                    if dep in original_df.columns:  # Add dependencies from the original dataframe
+                        subset[dep] = original_df[dep]
+                        used_dep_list.append(dep)
+                relations.append(subset)
+
+    else:
+        # for the determinant and its list of deps causing the transitivity
+        # if the list of dependents is equal to the list of dependencies in the intermediate_attrs
+        # then the middle inter attribute is equal to the key of that dict
+        for key, dependent_attr in trans_dep_subset_dict.items():
+            inter_attr = key
+            # add the inter_attr and its dependencies to the subset df
+            subset = df[[inter_attr]].drop_duplicates()
+            for dep in dependent_attr:
+                if dep in original_df.columns:
+                    subset[dep] = original_df[dep]
+            # add new df to relations list
+            relations.append(subset)
+
+        for dep_list in trans_dep_subset_dict.values():
+            for dep in dep_list:
+                used_dep_list.append(dep)
 
     # Put the remaining non-key attributes into the next df subset
 
-    remaining_attrs = [col for col in df.columns if col not in used_dep_list]
-    remaining_relation = df[remaining_attrs].drop_duplicates()
-    relations.append(remaining_relation)
+    remaining_df_attrs = [col for col in df.columns if col not in used_dep_list]
+
+    # Check if remaining_attrs are in the columns of the subset; exclude them if already present
+    remaining_attrs = [col for col in remaining_df_attrs if col not in subset.columns]
+
+    # If there are any remaining attributes, create a new relation for them
+    if remaining_attrs:
+        remaining_relation = df[remaining_attrs].drop_duplicates()
+        relations.append(remaining_relation)
+
+    # If the relation only has one column, add its dependents to the df
+    for relation in relations:
+        if len(relation.columns) == 1:
+            loner_column = relation.columns[0]
+            for deter, depends in FD_list:
+                if deter == loner_column:
+                    for dep in depends:
+                        if dep in original_df.columns:
+                            relation[dep] = original_df[dep]
 
     # remove any duplicate rows from the dataframe
 
     for i, relation in enumerate(relations):
         relations[i] = relation.drop_duplicates()
 
-    return relations
+    # Ensure the last df is not added if all its columns are already used
+    final_relations = []
+    used_columns = set()
+
+    for relation in relations:
+        if set(relation.columns).issubset(used_columns):
+            continue  # Skip this relation if all its columns are already used
+        final_relations.append(relation)
+        used_columns.update(relation.columns)
+
+    return final_relations
 
 
 def main():
