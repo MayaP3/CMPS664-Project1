@@ -487,6 +487,32 @@ def main():
     print("")
     print("Decomposed Dataframes that satisfy 3NF:")
 
+    if pass_1NF:
+        if satisfies_2nf:
+            if satisfies_3nf:
+                print("Dataframe is already in 3NF", df)
+            else:
+                new_dfs = decompose_to_3nf(df, transitive_dependencies)
+                for df in new_dfs:
+                    print("")
+                    print("")
+                    print(df)
+        else:
+            attr_found = set()
+            new_dfs = decompose_to_2nf(df, possible_partial_dependencies)
+            for df in new_dfs:
+                newest_dfs = decompose_to_3nf(original_df, df, FD_list, transitive_dependencies)
+                for subset in newest_dfs:
+
+                    if len(attr_found) != len(relation):
+                        print(subset)
+                        print("")
+                        print("")
+                        attr_found.update(subset.columns)
+                        print("Attrs Found: ", attr_found)
+    else:
+        print("Doesn't Pass 1NF (every row unique and every cell having one value)")
+
 
 if __name__ == '__main__':
     main()
