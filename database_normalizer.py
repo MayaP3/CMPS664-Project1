@@ -11,10 +11,14 @@ def display_data(csv_path):
     data = pd.read_csv(csv_path)
     df = pd.DataFrame(data)
 
-    print(df.head)
+    print("Given Dataframe: ")
+    print("")
+    print(df.head())
+    print("")
+    print("DataFrame Column DataTypes: ")
+    print("")
     print(df.dtypes)
-
-    return df
+    print("")
 
 
 def database_fds(functional_dependencies: list):
@@ -162,7 +166,7 @@ def compute_closure(FD_list: list):
     # and deps
     # ['A', 'B', 'C', 'A|B', 'A/B', 'A/B', 'A/C', 'A/A|B', ..., 'A/B/C/A|B']
     attribute_combos_results = attribute_combos(determinants, dependents)
-    print(attribute_combos_results)
+    print("Attribute_Combos: ", attribute_combos_results)
 
     # Finding closure of every possible attr combo
     for attr_combo in attribute_combos_results:
@@ -415,6 +419,7 @@ def decompose_to_3nf(df: pd.DataFrame, transitive_dependencies: dict) -> list:
             trans_dep_subset_dict[key] = value
 
     print("Transitive Dict of the attributes: ", trans_dep_subset_dict)
+    print("")
 
     relations = []
 
@@ -457,21 +462,30 @@ def decompose_to_3nf(df: pd.DataFrame, transitive_dependencies: dict) -> list:
 def main():
 
     csv_path = input("Give path to csv file: ")
-    display_data(csv_path)
+    df = display_data(csv_path)
 
-    # relation_name = input("Enter relation name: ")
+    original_df = df
+
     functional_dependencies = [fd.replace(" ", "") for fd in input("Enter functional dependencies (e.g., A->B,D; C->D): ").split(';')]
     primary_keys = [key.strip() for key in input("Enter primary key(s): ").split(',')]
 
-    print(functional_dependencies)
-
-    determinants, dependents, FD_list = database_fds(functional_dependencies)
+    relation, determinants, dependents, FD_list = database_fds(functional_dependencies)
 
     closure_dict = compute_closure(FD_list)
 
-    find_partial_dependencies(primary_keys, closure_dict)
+    suggest_candidate_key(relation, closure_dict)
 
-    find_transitive_dependencies(closure_dict, determinants, FD_list)
+    pass_1NF = check_1NF(df)
+
+    satisfies_2nf, possible_partial_dependencies = find_partial_dependencies(primary_keys, closure_dict)
+
+    satisfies_3nf, transitive_dependencies = find_transitive_dependencies(closure_dict, determinants, dependents, FD_list)
+
+    print("Partial Dependencies: ", possible_partial_dependencies)
+    print("")
+    print("Transitive_Dependencies: ", transitive_dependencies)
+    print("")
+    print("Decomposed Dataframes that satisfy 3NF:")
 
 
 if __name__ == '__main__':
