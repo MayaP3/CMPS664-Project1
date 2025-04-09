@@ -547,6 +547,7 @@ def insert_data(cursor):
     except mysql.connector.Error as err:
         print(f"Error: {err}")
 
+
 def update_data(cursor):
     """Function to update data in a table"""
     table_name = input("Enter the table name: ")
@@ -630,6 +631,12 @@ def main():
     mycursor = mydbase.cursor()
 
     def create_table_if_not_exists(table_name, columns):
+        # Dropping the table if it already exists
+        drop_table_query = f"DROP TABLE IF EXISTS Project1.{table_name};"
+        mycursor.execute(drop_table_query)
+        print(f"Table {table_name} dropped if it existed.")
+
+        # Creating or Recreating table
         column_definitions = ', '.join([f"`{col}` VARCHAR(255)" for col in columns])
         create_table_query = f"CREATE TABLE IF NOT EXISTS Project1.{table_name} ({column_definitions})"
         mycursor.execute(create_table_query)
