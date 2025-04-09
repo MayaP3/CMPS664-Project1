@@ -1,4 +1,5 @@
 import pandas as pd
+import mysql.connector
 import itertools
 
 
@@ -537,6 +538,8 @@ def main():
     print("")
     print("Decomposed Dataframes that satisfy 3NF:")
 
+    decomposed_dfs = []
+
     if pass_1NF:
         if satisfies_2nf:
             if satisfies_3nf:
@@ -547,6 +550,7 @@ def main():
                     print("")
                     print("")
                     print(df)
+                    decomposed_dfs.append(df)
         else:
             attr_found = set()
             new_dfs = decompose_to_2nf(df, possible_partial_dependencies)
@@ -556,12 +560,48 @@ def main():
 
                     if len(attr_found) != len(relation):
                         print(subset)
+                        decomposed_dfs.append(subset)
                         print("")
                         print("")
                         attr_found.update(subset.columns)
                         print("Attrs Found: ", attr_found)
     else:
         print("Doesn't Pass 1NF (every row unique and every cell having one value)")
+
+    mydbase = mysql.connector.connect(host="localhost",
+                                      user="root",
+                                      passwd="Buggyduggy2233!",
+                                      database="Project1")
+
+    mycursor = mydbase.cursor()
+
+    n = 0
+    for df in decomposed_dfs:
+        n += 1
+        table_title = f"Table#{n}"
+        for row in df.itertuples(index=False):
+            columns = ', '.join(df.columns)
+            placeholders = ', '.join(['%s'] * len(df.columns))
+
+            # Create a tuple with the values for this row
+            values = tuple(getattr(row, col) for col in df.columns)
+
+            # Build the custom INSERT statement
+            insert_statement = f"INSERT INTO Project1.{table_title} ({columns}) VALUES ({placeholders})"
+
+            # print(columns)
+            # print(placeholders)
+            # print(values)
+            # print(insert_statement)
+            # print("")
+            # Execute the custom INSERT statement with the values
+            mycursor.execute(insert_statement, values)
+
+    mydbase.commit()
+
+    # Close the cursor and connection
+    mycursor.close()
+    mydbase.close()
 
 
 if __name__ == '__main__':
