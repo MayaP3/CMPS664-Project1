@@ -622,7 +622,7 @@ def main():
             if satisfies_3nf:
                 print("Dataframe is already in 3NF", df)
             else:
-                new_dfs = decompose_to_3nf(df, transitive_dependencies)
+                new_dfs = decompose_to_3nf(original_df, df, FD_list, transitive_dependencies)
                 for df in new_dfs:
                     print("")
                     print("")
