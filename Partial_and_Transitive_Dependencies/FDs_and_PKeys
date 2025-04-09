@@ -1,0 +1,7 @@
+# Student_Enrollment
+# FDs: Student_ID|Course_ID -> Instructor; Instructor -> Instructor_Phone; Student_ID -> Instructor; Student_ID -> Instructor_Phone
+# PKeys: Student_ID, Course_ID
+
+# Order_and_Prducts
+# FDs: Order_ID|Product_ID -> Product_Name; Product_ID -> Supplier_Name; Supplier_Name -> Supplier_Phone; Order_ID -> Product_Name; Order_ID -> Supplier_Phone
+# PKeys: Order_ID, Product_ID

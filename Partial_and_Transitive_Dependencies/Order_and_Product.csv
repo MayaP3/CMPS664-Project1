@@ -1,0 +1,7 @@
+Order_ID,Product_ID,Product_Name,Supplier_Name,Supplier_Phone
+O1001,P001,Widget,Acme Corp,555-1111
+O1002,P002,Gadget,Global Supplies,555-2222
+O1003,P001,Widget,Acme Corp,555-1111
+O1004,P003,Tool,Quick Tools,555-3333
+O1005,P002,Gadget,Global Supplies,555-2222
+O1006,P004,Device,Tech World,555-4444
