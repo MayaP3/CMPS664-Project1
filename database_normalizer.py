@@ -585,6 +585,21 @@ def delete_data(cursor):
         print(f"Error: {err}")
 
 
+def run_custom_query(cursor):
+    """Function to run custom SQL queries"""
+    query = input("Enter your SQL query: ")
+    try:
+        cursor.execute(query)
+        results = cursor.fetchall()
+        if results:
+            for row in results:
+                print(row)
+        else:
+            print("No results returned.")
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+
+
 def main():
 
     # Step 1: CSV Data Import
@@ -717,6 +732,7 @@ def interactive_menu():
         print("Insert Data")
         print("Update Data")
         print("Delete Data")
+        print("Run Custom SQL Query")
         print("Exit")
 
         choice = input("Choose an operation: ")
@@ -727,6 +743,8 @@ def interactive_menu():
             update_data(cursor)
         elif choice == "Delete Data":
             delete_data(cursor)
+        elif choice == "Run Custom SQL Query":
+            run_custom_query(cursor)
         elif choice == "Exit":
             print("Exiting Interface")
             break
