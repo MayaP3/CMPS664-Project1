@@ -538,7 +538,7 @@ def insert_data(cursor):
     """Function to insert data into a table"""
     table_name = input("Enter the table name: ")
     columns = input("Enter the columns (comma separated): ")
-    values = input("Enter the values (comma separated): ")
+    values = input("Enter the values (comma separated, each value in ''): ")
 
     insert_query = f"INSERT INTO {table_name} ({columns}) VALUES ({values})"
     try:
@@ -626,6 +626,8 @@ def main():
     for df in decomposed_dfs:
         n += 1
         table_title = f"Table{n}"
+        print("Table_title: ", table_title)
+        print("Dataframe Columns: ", df.columns)
         create_table_if_not_exists(table_title, df.columns)
 
         for row in df.itertuples(index=False):
