@@ -512,13 +512,50 @@ def decompose_to_3nf(original_df: pd.DataFrame, df: pd.DataFrame, FD_list: list,
     return final_relations
 
 
+def connect_to_db():
+    """Function to connect to MySQL Database"""
+    try:
+        connection = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            passwd="Buggyduggy2233!",
+            database="Project1"
+        )
+        print("Connected to the database successfully.")
+        return connection
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+        return None
+
+
+def close_connection(connection):
+    """Function to close the database connection"""
+    connection.close()
+    print("Connection closed.")
+
+
+def insert_data(cursor):
+    """Function to insert data into a table"""
+    table_name = input("Enter the table name: ")
+    columns = input("Enter the columns (comma separated): ")
+    values = input("Enter the values (comma separated): ")
+
+    insert_query = f"INSERT INTO {table_name} ({columns}) VALUES ({values})"
+    try:
+        cursor.execute(insert_query)
+        print(f"Data inserted successfully into {table_name}.")
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+
+
 def main():
 
+    # Step 1: CSV Data Import 
     csv_path = input("Give path to csv file: ")
     df = display_data(csv_path)
-
     original_df = df
 
+    # Step 2: Functional Dependency Identification
     functional_dependencies = [fd.replace(" ", "") for fd in input("Enter functional dependencies (e.g., A->B,D; C->D): ").split(';')]
     primary_keys = [key.strip() for key in input("Enter primary key(s): ").split(',')]
 
@@ -528,6 +565,7 @@ def main():
 
     suggest_candidate_key(relation, closure_dict)
 
+    # Step 3: Normalization Process
     pass_1NF = check_1NF(df)
 
     satisfies_2nf, possible_partial_dependencies = find_partial_dependencies(primary_keys, closure_dict)
@@ -570,6 +608,7 @@ def main():
     else:
         print("Doesn't Pass 1NF (every row unique and every cell having one value)")
 
+    # Step 4: SQL Script Generation
     mydbase = mysql.connector.connect(host="localhost",
                                       user="root",
                                       passwd="Buggyduggy2233!",
@@ -609,5 +648,31 @@ def main():
     mydbase.close()
 
 
+def interactive_menu():
+    """Function to display the interactive menu and accept user input"""
+    connection = connect_to_db()
+    if not connection:
+        return
+
+    cursor = connection.cursor()
+
+    while True:
+        print("\nInteractive Query Interface")
+        print("Operation Choices: ")
+        print("Insert Data")
+
+        choice = input("Choose an operation: ")
+
+        if choice == "Insert Data":
+            insert_data(cursor)
+
+        else:
+            print("Invalid choice. Please try again.")
+
+    connection.commit()
+    close_connection(connection)
+
+
 if __name__ == '__main__':
     main()
+    interactive_menu()
