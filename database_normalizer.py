@@ -660,11 +660,15 @@ def interactive_menu():
         print("\nInteractive Query Interface")
         print("Operation Choices: ")
         print("Insert Data")
+        print("Exit")
 
         choice = input("Choose an operation: ")
 
         if choice == "Insert Data":
             insert_data(cursor)
+        elif choice == "Exit":
+            print("Exiting Interface")
+            break
 
         else:
             print("Invalid choice. Please try again.")
