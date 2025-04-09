@@ -2,6 +2,13 @@ import pandas as pd
 import mysql.connector
 import itertools
 
+mydbase = mysql.connector.connect(host="localhost",
+                                  user="root",
+                                  passwd="Buggyduggy2233!",
+                                  database="Project1")
+
+mycursor = mydbase.cursor()
+
 
 def display_data(csv_path):
     """Takes in csv path, cleans the input by removing '"' and replacing '\'
@@ -543,6 +550,7 @@ def insert_data(cursor):
     insert_query = f"INSERT INTO {table_name} ({columns}) VALUES ({values})"
     try:
         cursor.execute(insert_query)
+        mydbase.commit()
         print(f"Data inserted successfully into {table_name}.")
     except mysql.connector.Error as err:
         print(f"Error: {err}")
@@ -557,6 +565,7 @@ def update_data(cursor):
     update_query = f"UPDATE {table_name} SET {set_values} WHERE {where_condition}"
     try:
         cursor.execute(update_query)
+        mydbase.commit()
         print(f"Data updated successfully in {table_name}.")
     except mysql.connector.Error as err:
         print(f"Error: {err}")
@@ -564,7 +573,7 @@ def update_data(cursor):
 
 def main():
 
-    # Step 1: CSV Data Import 
+    # Step 1: CSV Data Import
     csv_path = input("Give path to csv file: ")
     df = display_data(csv_path)
     original_df = df
@@ -636,11 +645,17 @@ def main():
         mycursor.execute(drop_table_query)
         print(f"Table {table_name} dropped if it existed.")
 
+        # Committing the drop action to ensure the table is removed before creation
+        mydbase.commit()
+
         # Creating or Recreating table
         column_definitions = ', '.join([f"`{col}` VARCHAR(255)" for col in columns])
         create_table_query = f"CREATE TABLE IF NOT EXISTS Project1.{table_name} ({column_definitions})"
         mycursor.execute(create_table_query)
         print(f"Table {table_name} checked/created.")
+
+        # Committing the creation action to apply the changes
+        mydbase.commit()
 
     n = 0
     for df in decomposed_dfs:
@@ -703,6 +718,8 @@ def interactive_menu():
 
     connection.commit()
     close_connection(connection)
+    mycursor.close()
+    mydbase.close()
 
 
 if __name__ == '__main__':
