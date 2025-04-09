@@ -547,6 +547,19 @@ def insert_data(cursor):
     except mysql.connector.Error as err:
         print(f"Error: {err}")
 
+def update_data(cursor):
+    """Function to update data in a table"""
+    table_name = input("Enter the table name: ")
+    set_values = input("Enter the values to set (e.g., column1 = value1, column2 = value2): ")
+    where_condition = input("Enter the WHERE condition (e.g., column = value): ")
+
+    update_query = f"UPDATE {table_name} SET {set_values} WHERE {where_condition}"
+    try:
+        cursor.execute(update_query)
+        print(f"Data updated successfully in {table_name}.")
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+
 
 def main():
 
@@ -630,6 +643,8 @@ def main():
         print("Dataframe Columns: ", df.columns)
         create_table_if_not_exists(table_title, df.columns)
 
+        print("Number of rows to insert:", len(df))
+
         for row in df.itertuples(index=False):
             columns = ', '.join(df.columns)
             placeholders = ', '.join(['%s'] * len(df.columns))
@@ -650,6 +665,7 @@ def main():
     mydbase.close()
 
 
+# Step 5: Database Creation and Query Interface
 def interactive_menu():
     """Function to display the interactive menu and accept user input"""
     connection = connect_to_db()
@@ -662,12 +678,15 @@ def interactive_menu():
         print("\nInteractive Query Interface")
         print("Operation Choices: ")
         print("Insert Data")
+        print("Update Data")
         print("Exit")
 
         choice = input("Choose an operation: ")
 
         if choice == "Insert Data":
             insert_data(cursor)
+        elif choice == "Update Data":
+            update_data(cursor)
         elif choice == "Exit":
             print("Exiting Interface")
             break
