@@ -729,23 +729,23 @@ def interactive_menu():
         print("\nInteractive Query Interface")
         print("Operation Choices: ")
         print("")
-        print("Insert Data")
-        print("Update Data")
-        print("Delete Data")
-        print("Run Custom SQL Query")
-        print("Exit")
+        print("1. Insert Data")
+        print("2. Update Data")
+        print("3. Delete Data")
+        print("4. Run Custom SQL Query")
+        print("5. Exit")
 
-        choice = input("Choose an operation: ")
+        choice = input("Choose an operation number: ")
 
-        if choice == "Insert Data":
+        if choice == "1":
             insert_data(cursor)
-        elif choice == "Update Data":
+        elif choice == "2":
             update_data(cursor)
-        elif choice == "Delete Data":
+        elif choice == "3":
             delete_data(cursor)
-        elif choice == "Run Custom SQL Query":
+        elif choice == "4":
             run_custom_query(cursor)
-        elif choice == "Exit":
+        elif choice == "5":
             print("Exiting Interface")
             break
 
