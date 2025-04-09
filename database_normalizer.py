@@ -559,14 +559,28 @@ def insert_data(cursor):
 def update_data(cursor):
     """Function to update data in a table"""
     table_name = input("Enter the table name: ")
-    set_values = input("Enter the values to set (e.g., column1 = value1, column2 = value2): ")
-    where_condition = input("Enter the WHERE condition (e.g., column = value): ")
+    set_values = input("Enter the values to set (i.e. column1 = 'value'): ")
+    where_condition = input("Enter the WHERE condition (i.e. column = 'value'): ")
 
     update_query = f"UPDATE {table_name} SET {set_values} WHERE {where_condition}"
     try:
         cursor.execute(update_query)
         mydbase.commit()
         print(f"Data updated successfully in {table_name}.")
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+
+
+def delete_data(cursor):
+    """Function to delete data from a table"""
+    table_name = input("Enter the table name: ")
+    where_condition = input("Enter the WHERE condition (i.e. column = 'value'): ")
+
+    # Prepare the SQL query for deletion
+    delete_query = f"DELETE FROM {table_name} WHERE {where_condition}"
+    try:
+        cursor.execute(delete_query)
+        print(f"Data deleted successfully from {table_name}.")
     except mysql.connector.Error as err:
         print(f"Error: {err}")
 
@@ -699,8 +713,10 @@ def interactive_menu():
     while True:
         print("\nInteractive Query Interface")
         print("Operation Choices: ")
+        print("")
         print("Insert Data")
         print("Update Data")
+        print("Delete Data")
         print("Exit")
 
         choice = input("Choose an operation: ")
@@ -709,6 +725,8 @@ def interactive_menu():
             insert_data(cursor)
         elif choice == "Update Data":
             update_data(cursor)
+        elif choice == "Delete Data":
+            delete_data(cursor)
         elif choice == "Exit":
             print("Exiting Interface")
             break
