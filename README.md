@@ -76,7 +76,7 @@ The script will ask for the following inputs:
 
 - Functional Dependencies: Enter the functional dependencies in the form of A|B -> C, D;  D->E.
 
-- Primary Key(s): Enter the primary keys for the relation. (A, B)
+- Primary Key(s): Enter the primary keys for the relation. A, B
 
 3. Normalization and SQL Script Generation
 
