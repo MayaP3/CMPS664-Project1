@@ -23,6 +23,9 @@ def display_data(csv_path):
     print("")
     print(df.head())
     print("")
+    rows, cols = df.shape
+    print("Rows: ", rows, "Columns: ", cols)
+    print("")
     print("DataFrame Column DataTypes: ")
     print("")
     print(df.dtypes)
@@ -73,14 +76,6 @@ def database_fds(functional_dependencies: list):
         # Update the relation by adding the dependent to it
         for r in right:
             relation.update(list({r}))
-
-    print("Relation: ", relation)
-    print("")
-    print("Deteminants: ", determinants)
-    print("")
-    print("Dependents: ", dependents)
-    print("")
-    print("Functional Dependencies: ", FD_list)
 
     # Relation is a set, deter and deps as a list and FD_List is a list
     # of tuples. The first index being the deter and the second being
@@ -176,7 +171,6 @@ def compute_closure(FD_list: list):
     # and deps
     # ['A', 'B', 'C', 'A|B', 'A/B', 'A/B', 'A/C', 'A/A|B', ..., 'A/B/C/A|B']
     attribute_combos_results = attribute_combos(determinants, dependents)
-    print("Attribute_Combos: ", attribute_combos_results)
 
     # Finding closure of every possible attr combo
     for attr_combo in attribute_combos_results:
@@ -188,9 +182,6 @@ def compute_closure(FD_list: list):
             attrs = [attrs for attrs in attr_combo.split('/')]
             for attr in attrs:
                 closure_dict[attr_combo].update(closure_dict[attr])
-
-    print("")
-    print("Closure Dict: ", closure_dict)
 
     return closure_dict
 
@@ -223,10 +214,6 @@ def find_partial_dependencies(primary_keys: list, closure_dict: dict) -> list:
                                 possible_partial_dependencies[i] = [dependency]
                             else:
                                 possible_partial_dependencies[i].append(dependency)
-
-    print("")
-    print("With primary keys: ", primary_keys)
-    print("Possible Partial Dependencies: ", possible_partial_dependencies)
 
     # If the possible_partial_dependencies list length is > 0, a partial_dep
     # was found and hence the dataframe does not satisfy 2NF
@@ -271,9 +258,6 @@ def find_transitive_dependencies(closure_dict: dict, determinants: list, depende
 
     # Convert transitive_deps' values from a set to a list
     transitive_dependencies = {key: list(value) for key, value in transitive_dependencies.items()}
-
-    print("")
-    print("Possible Transitive Dependencies: ", transitive_dependencies)
 
     # If the transitive_dependencies list length is > 0, a transitive_dep was
     # found and hence the dataframe does not satisfy 3NF
@@ -345,8 +329,6 @@ def suggest_candidate_key(relation: set, closure_dict: dict):
                 if cand_key1 == cand_key2 and key1 != key2:
                     del candidate_keys[key2]
 
-    print("Candidate Keys: ", candidate_keys)
-
     return candidate_keys
 
 
@@ -399,8 +381,6 @@ def decompose_to_2nf(df: pd.DataFrame, possible_partial_dependencies: dict) -> l
         for _ in dep:
             used_dep_list.append(_)
 
-    print("Used_deps: ", used_dep_list)
-
     # Put the remaining non-key attributes into the next df subset
     remaining_attrs = [col for col in df.columns if col not in used_dep_list]
     remaining_relation = df[remaining_attrs].drop_duplicates()
@@ -428,23 +408,7 @@ def decompose_to_3nf(original_df: pd.DataFrame, df: pd.DataFrame, FD_list: list,
         if key in df.columns:
             trans_dep_subset_dict[key] = value
 
-    print("Transitive Dict of the attributes: ", trans_dep_subset_dict)
-    print("")
-
     relations = []
-
-    # for the determinant and its list of deps causing the transitivity
-    # if the list of dependents is equal to the list of dependencies in the
-    # intermediate_attrs then the middle inter attribute is equal to the
-    # key of that dict
-    for key, dependent_attr in trans_dep_subset_dict.items():
-        inter_attr = key
-        # add the inter_attr and its dependencies to the subset df
-        subset = df[[inter_attr]].drop_duplicates()
-        for dep in dependent_attr:
-            subset[dep] = df[dep]
-        # add new df to relations list
-        relations.append(subset)
 
     # keep track of the dependencies already added to a subset df
     used_dep_list = []
@@ -480,24 +444,16 @@ def decompose_to_3nf(original_df: pd.DataFrame, df: pd.DataFrame, FD_list: list,
                 used_dep_list.append(dep)
 
     # Put the remaining non-key attributes into the next df subset
-    print("Used_dep_list: ", used_dep_list)
-    print("Subset Columns: ", subset.columns)
-    print("DF Columns: ", df.columns)
+
     remaining_df_attrs = [col for col in df.columns if col not in used_dep_list]
 
-    print("Remaining Attrs: ", remaining_df_attrs)
     # Check if remaining_attrs are in the columns of the subset; exclude them if already present
     # remaining_attrs = [col for col in remaining_df_attrs if col in subset.columns]
 
     # If there are any remaining attributes, create a new relation for them
     if remaining_df_attrs:
         remaining_relation = df[remaining_df_attrs].drop_duplicates()
-        print(remaining_relation)
         relations.append(remaining_relation)
-
-    print("List of Relations: ")
-    for relation in relations:
-        print(relation)
 
     # If the relation only has one column, add its dependents to the df
     for relation in relations:
@@ -514,7 +470,6 @@ def decompose_to_3nf(original_df: pd.DataFrame, df: pd.DataFrame, FD_list: list,
     for i, relation in enumerate(relations):
         relations[i] = relation.drop_duplicates()
 
-    # If relation len != 1 and is less than len(orginal_df.columns)
     # Ensure the last df is not added if all its columns are already used
     final_relations = []
 
@@ -523,15 +478,7 @@ def decompose_to_3nf(original_df: pd.DataFrame, df: pd.DataFrame, FD_list: list,
         if len(relation.columns) > 1 and len(relation.columns) < len(original_df.columns):
             if not any(relation_columns_set == set(r.columns) for r in final_relations):
                 final_relations.append(relation)
-    # used_columns = set()
 
-    # for relation in relations:
-    #     if set(relation.columns).issubset(used_columns):
-    #         continue  # Skip this relation if all its columns are already used
-    #     final_relations.append(relation)
-    #     used_columns.update(relation.columns)
-
-    print("Final Relations: ", final_relations)
     return final_relations
 
 
@@ -631,7 +578,8 @@ def main():
 
     closure_dict = compute_closure(FD_list)
 
-    suggest_candidate_key(relation, closure_dict)
+    candidate_keys = suggest_candidate_key(relation, closure_dict)
+    print("Candidate Key(s): ", candidate_keys)
 
     # Step 3: Normalization Process
     pass_1NF = check_1NF(df)
@@ -639,12 +587,6 @@ def main():
     satisfies_2nf, possible_partial_dependencies = find_partial_dependencies(primary_keys, closure_dict)
 
     satisfies_3nf, transitive_dependencies = find_transitive_dependencies(closure_dict, determinants, dependents, FD_list)
-
-    print("Partial Dependencies: ", possible_partial_dependencies)
-    print("")
-    print("Transitive_Dependencies: ", transitive_dependencies)
-    print("")
-    print("Decomposed Dataframes that satisfy 3NF:")
 
     decomposed_dfs = []
 
@@ -655,9 +597,6 @@ def main():
             else:
                 new_dfs = decompose_to_3nf(original_df, df, FD_list, transitive_dependencies)
                 for df in new_dfs:
-                    print("")
-                    print("")
-                    print(df)
                     decomposed_dfs.append(df)
         else:
             attr_found = set()
@@ -665,16 +604,17 @@ def main():
             for df in new_dfs:
                 newest_dfs = decompose_to_3nf(original_df, df, FD_list, transitive_dependencies)
                 for subset in newest_dfs:
-
                     if len(attr_found) != len(relation):
-                        print(subset)
                         decomposed_dfs.append(subset)
-                        print("")
-                        print("")
-                        attr_found.update(subset.columns)
-                        print("Attrs Found: ", attr_found)
+
     else:
         print("Doesn't Pass 1NF (every row unique and every cell having one value)")
+
+    print("")
+    print("Decomposed Dataframes: ")
+    for df in decomposed_dfs:
+        print(df)
+        print("")
 
     # Step 4: SQL Script Generation
     mydbase = mysql.connector.connect(host="localhost",
@@ -688,7 +628,6 @@ def main():
         # Dropping the table if it already exists
         drop_table_query = f"DROP TABLE IF EXISTS Project1.{table_name};"
         mycursor.execute(drop_table_query)
-        print(f"Table {table_name} dropped if it existed.")
 
         # Committing the drop action to ensure the table is removed before creation
         mydbase.commit()
@@ -697,7 +636,7 @@ def main():
         column_definitions = ', '.join([f"`{col}` VARCHAR(255)" for col in columns])
         create_table_query = f"CREATE TABLE IF NOT EXISTS Project1.{table_name} ({column_definitions})"
         mycursor.execute(create_table_query)
-        print(f"Table {table_name} checked/created.")
+        print(f"Table {table_name} created.")
 
         # Committing the creation action to apply the changes
         mydbase.commit()
@@ -706,23 +645,13 @@ def main():
     for df in decomposed_dfs:
         n += 1
         table_title = f"Table{n}"
-        print("Table_title: ", table_title)
-        print("Dataframe Columns: ", df.columns)
         create_table_if_not_exists(table_title, df.columns)
-
-        print("Number of rows to insert:", len(df))
 
         for row in df.itertuples(index=False):
             columns = ', '.join(df.columns)
             placeholders = ', '.join(['%s'] * len(df.columns))
             values = tuple(getattr(row, col) for col in df.columns)
             insert_statement = f"INSERT INTO Project1.{table_title} ({columns}) VALUES ({placeholders})"
-
-            print(columns)
-            print(placeholders)
-            print(values)
-            print(insert_statement)
-            print("")
 
             mycursor.execute(str(insert_statement), values)
 
