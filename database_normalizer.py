@@ -480,16 +480,24 @@ def decompose_to_3nf(original_df: pd.DataFrame, df: pd.DataFrame, FD_list: list,
                 used_dep_list.append(dep)
 
     # Put the remaining non-key attributes into the next df subset
-
+    print("Used_dep_list: ", used_dep_list)
+    print("Subset Columns: ", subset.columns)
+    print("DF Columns: ", df.columns)
     remaining_df_attrs = [col for col in df.columns if col not in used_dep_list]
 
+    print("Remaining Attrs: ", remaining_df_attrs)
     # Check if remaining_attrs are in the columns of the subset; exclude them if already present
-    remaining_attrs = [col for col in remaining_df_attrs if col not in subset.columns]
+    # remaining_attrs = [col for col in remaining_df_attrs if col in subset.columns]
 
     # If there are any remaining attributes, create a new relation for them
-    if remaining_attrs:
-        remaining_relation = df[remaining_attrs].drop_duplicates()
+    if remaining_df_attrs:
+        remaining_relation = df[remaining_df_attrs].drop_duplicates()
+        print(remaining_relation)
         relations.append(remaining_relation)
+
+    print("List of Relations: ")
+    for relation in relations:
+        print(relation)
 
     # If the relation only has one column, add its dependents to the df
     for relation in relations:
@@ -506,16 +514,24 @@ def decompose_to_3nf(original_df: pd.DataFrame, df: pd.DataFrame, FD_list: list,
     for i, relation in enumerate(relations):
         relations[i] = relation.drop_duplicates()
 
+    # If relation len != 1 and is less than len(orginal_df.columns)
     # Ensure the last df is not added if all its columns are already used
     final_relations = []
-    used_columns = set()
 
     for relation in relations:
-        if set(relation.columns).issubset(used_columns):
-            continue  # Skip this relation if all its columns are already used
-        final_relations.append(relation)
-        used_columns.update(relation.columns)
+        relation_columns_set = set(relation.columns)
+        if len(relation.columns) > 1 and len(relation.columns) < len(original_df.columns):
+            if not any(relation_columns_set == set(r.columns) for r in final_relations):
+                final_relations.append(relation)
+    # used_columns = set()
 
+    # for relation in relations:
+    #     if set(relation.columns).issubset(used_columns):
+    #         continue  # Skip this relation if all its columns are already used
+    #     final_relations.append(relation)
+    #     used_columns.update(relation.columns)
+
+    print("Final Relations: ", final_relations)
     return final_relations
 
 
